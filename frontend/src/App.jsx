@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Detail from "./pages/Detail";
 
 function App() {
   return (
@@ -23,6 +24,16 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Exercise Detail Page */}
+          <Route
+            path="/detail/:id"
+            element={
+              <ProtectedRoute>
+                <Detail />
               </ProtectedRoute>
             }
           />
