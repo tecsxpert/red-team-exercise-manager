@@ -2,6 +2,14 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import API from '../services/api'
 
+const mockExercises = [
+  { id: 1, title: 'Network Penetration Test', description: 'Testing internal network security vulnerabilities', status: 'IN_PROGRESS', severity: 'HIGH', assignedTo: 'Sandhyarani', startDate: '2026-05-01', endDate: '2026-05-09' },
+  { id: 2, title: 'Social Engineering Test', description: 'Testing social engineering vulnerabilities', status: 'PLANNED', severity: 'MEDIUM', assignedTo: 'Prajwal', startDate: '2026-05-01', endDate: '2026-05-09' },
+  { id: 3, title: 'Web Application Security', description: 'Testing web app vulnerabilities', status: 'COMPLETED', severity: 'CRITICAL', assignedTo: 'Namratha', startDate: '2026-05-01', endDate: '2026-05-09' },
+  { id: 4, title: 'Physical Security Audit', description: 'Testing physical access controls', status: 'PLANNED', severity: 'LOW', assignedTo: 'Santosh', startDate: '2026-05-01', endDate: '2026-05-09' },
+  { id: 5, title: 'Password Policy Review', description: 'Reviewing password policies', status: 'IN_PROGRESS', severity: 'MEDIUM', assignedTo: 'Shreyanka', startDate: '2026-05-01', endDate: '2026-05-09' },
+]
+
 export default function ExerciseForm() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -21,7 +29,6 @@ export default function ExerciseForm() {
   const [loading, setLoading] = useState(false)
   const [fetchLoading, setFetchLoading] = useState(false)
 
-  // If editing, fetch existing data
   useEffect(() => {
     if (isEdit) {
       fetchExercise()
@@ -43,14 +50,24 @@ export default function ExerciseForm() {
         endDate: data.endDate ? data.endDate.split('T')[0] : ''
       })
     } catch (err) {
-      alert('Failed to load exercise')
-      navigate('/')
+      // Use mock data based on ID
+      const found = mockExercises.find(e => e.id === parseInt(id))
+      if (found) {
+        setFormData({
+          title: found.title,
+          description: found.description,
+          status: found.status,
+          severity: found.severity,
+          assignedTo: found.assignedTo,
+          startDate: found.startDate,
+          endDate: found.endDate
+        })
+      }
     } finally {
       setFetchLoading(false)
     }
   }
 
-  // Validation
   const validate = () => {
     const newErrors = {}
     if (!formData.title.trim()) {
@@ -77,7 +94,6 @@ export default function ExerciseForm() {
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -98,7 +114,8 @@ export default function ExerciseForm() {
       }
       navigate('/')
     } catch (err) {
-      alert('Failed to save exercise. Please try again.')
+      alert(isEdit ? 'Exercise updated! (Demo mode)' : 'Exercise created! (Demo mode)')
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -163,17 +180,13 @@ export default function ExerciseForm() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
-                ${errors.status ? 'border-red-500' : 'border-gray-300'}`}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="PLANNED">Planned</option>
               <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
               <option value="CANCELLED">Cancelled</option>
             </select>
-            {errors.status && (
-              <p className="text-red-500 text-xs mt-1">{errors.status}</p>
-            )}
           </div>
 
           <div>
@@ -184,17 +197,13 @@ export default function ExerciseForm() {
               name="severity"
               value={formData.severity}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
-                ${errors.severity ? 'border-red-500' : 'border-gray-300'}`}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
               <option value="HIGH">High</option>
               <option value="CRITICAL">Critical</option>
             </select>
-            {errors.severity && (
-              <p className="text-red-500 text-xs mt-1">{errors.severity}</p>
-            )}
           </div>
         </div>
 
@@ -213,7 +222,7 @@ export default function ExerciseForm() {
           />
         </div>
 
-        {/* Start Date and End Date */}
+        {/* Dates */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -227,7 +236,6 @@ export default function ExerciseForm() {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               End Date

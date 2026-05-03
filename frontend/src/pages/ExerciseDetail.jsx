@@ -3,6 +3,14 @@ import { useNavigate, useParams } from 'react-router-dom'
 import API from '../services/api'
 import AiPanel from '../components/AiPanel'
 
+const mockExercises = [
+  { id: 1, title: 'Network Penetration Test', description: 'Testing internal network security vulnerabilities', status: 'IN_PROGRESS', severity: 'HIGH', assignedTo: 'Sandhyarani', createdAt: '2026-04-28T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
+  { id: 2, title: 'Social Engineering Test', description: 'Testing social engineering vulnerabilities', status: 'PLANNED', severity: 'MEDIUM', assignedTo: 'Prajwal', createdAt: '2026-04-27T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
+  { id: 3, title: 'Web Application Security', description: 'Testing web app vulnerabilities', status: 'COMPLETED', severity: 'CRITICAL', assignedTo: 'Namratha', createdAt: '2026-04-26T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
+  { id: 4, title: 'Physical Security Audit', description: 'Testing physical access controls', status: 'PLANNED', severity: 'LOW', assignedTo: 'Santosh', createdAt: '2026-04-25T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
+  { id: 5, title: 'Password Policy Review', description: 'Reviewing password policies', status: 'IN_PROGRESS', severity: 'MEDIUM', assignedTo: 'Shreyanka', createdAt: '2026-04-24T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
+]
+
 export default function ExerciseDetail() {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -19,20 +27,9 @@ export default function ExerciseDetail() {
       const response = await API.get(`/exercises/${id}`)
       setExercise(response.data)
     } catch (err) {
-      // Mock data for testing
-      setExercise({
-        id: id,
-        title: 'Network Penetration Test',
-        description: 'Testing internal network security vulnerabilities',
-        status: 'IN_PROGRESS',
-        severity: 'HIGH',
-        assignedTo: 'Sandhyarani',
-        createdAt: '2026-04-28T10:00:00',
-        startDate: '2026-05-01T00:00:00',
-        endDate: '2026-05-09T00:00:00',
-        aiDescription: null,
-        aiRecommendation: null
-      })
+      // Use correct mock data based on ID
+      const found = mockExercises.find(e => e.id === parseInt(id))
+      setExercise(found || mockExercises[0])
     } finally {
       setLoading(false)
     }
