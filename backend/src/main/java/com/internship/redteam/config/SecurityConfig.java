@@ -40,7 +40,9 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/email/**").permitAll()   // 🔥 ALLOW EMAIL
+                .requestMatchers("/users/**").permitAll()
                 .anyRequest().authenticated()
             )
 
