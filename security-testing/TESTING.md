@@ -2,7 +2,6 @@
 
 ## Project Overview
 Security assessment conducted on the AI microservice component of the Red Team Exercise Manager project.
-
 Due to incomplete project deployment configuration, only the AI service was available for testing.
 
 ---
