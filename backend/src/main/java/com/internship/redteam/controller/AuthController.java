@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -21,47 +18,25 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // 🔐 LOGIN
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User request) {
-
-        User user = userService.login(request.getEmail(), request.getPassword());
-
-        if (user == null) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
-
-        String token = jwtUtil.generateToken(user.getEmail());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-
-        return ResponseEntity.ok(response);
-    }
-
-    // 🟢 REGISTER
+    // REGISTER
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<User> register(@RequestBody User user) {
         return ResponseEntity.ok(userService.createUser(user));
     }
 
-    // 🔄 REFRESH TOKEN
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestHeader("Authorization") String header) {
+    // LOGIN
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody User user) {
 
-        String token = header.substring(7);
+        User dbUser = userService.login(user.getEmail(), user.getPassword());
 
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(401).body("Invalid token");
+        if (dbUser == null) {
+            return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        String email = jwtUtil.extractEmail(token);
+        // 🔥 IMPORTANT (ROLE INCLUDED)
+        String token = jwtUtil.generateToken(dbUser.getEmail(), dbUser.getRole());
 
-        String newToken = jwtUtil.generateToken(email);
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", newToken);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(token);
     }
 }
