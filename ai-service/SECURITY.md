@@ -1,28 +1,16 @@
-# Day 7 Security Report
+## Day 9 — Security Sign-Off
 
-## Tool Used
-OWASP ZAP
+### Injection Protection
+Tested with malicious inputs (script tags). No execution occurred.
 
-## Target
-http://127.0.0.1:5000/report
+### Input Validation
+API handles invalid and empty inputs correctly.
 
-## Observations
-- AI service is running locally on port 5000
-- Endpoint /report requires POST method
-- Automated scan failed due to local proxy connection issue
-- Root endpoint (/) not defined
+### Rate Limiting
+Not implemented yet (planned improvement).
 
-## Potential Security Risks
-- Lack of input validation
-- No authentication mechanism
-- No rate limiting
-- Possible prompt injection risk
+### PII Audit
+No personal or sensitive user data is used in prompts or responses.
 
-## Fix Plan
-- Add input sanitisation middleware
-- Implement rate limiting (flask-limiter)
-- Validate request payload
-- Add error handling
-
-## Status
-Security review completed for AI service
+### Status
+Security verification completed successfully.

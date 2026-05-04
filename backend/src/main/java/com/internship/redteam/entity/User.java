@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")   // ✅ ADD THIS LINE
+@Table(name = "users")
 public class User {
 
     @Id
@@ -14,7 +14,7 @@ public class User {
     private String name;
     private String email;
     private String password;
-
+    private String role; // 🔥 role added
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -37,6 +37,10 @@ public class User {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    // 🔥 ADD THESE (IMPORTANT)
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

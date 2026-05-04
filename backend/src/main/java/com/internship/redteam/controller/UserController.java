@@ -1,6 +1,7 @@
 package com.internship.redteam.controller;
 
 import com.internship.redteam.entity.User;
+import com.internship.redteam.dto.UserDTO;   // 🔥 ADD THIS
 import com.internship.redteam.service.UserService;
 
 import jakarta.validation.Valid;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/users")
@@ -35,9 +37,10 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // GET ALL USERS (PAGINATION)
+    // GET ALL USERS (ONLY ADMIN CAN ACCESS)
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<Page<User>> getAllUsers(
+    public ResponseEntity<Page<UserDTO>> getAllUsers(   // 🔥 CHANGED TO DTO
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size) {
 
