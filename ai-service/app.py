@@ -1,40 +1,52 @@
 from flask import Flask, request, jsonify
-from middleware import sanitize_input, detect_prompt_injection
 from services.groq_client import call_groq
-from datetime import datetime
 
 app = Flask(__name__)
 
+# Home route
+@app.route("/")
+def home():
+    return "AI Service Running"
+
+# Test route
+@app.route("/test")
+def test():
+    return "Test endpoint working"
+
+# Main AI Report route
 @app.route("/report", methods=["POST"])
-def generate_report():
-    data = request.json.get("topic", "")
+def report():
+    data = request.json
 
-    clean_text = sanitize_input(data)
-
-    if detect_prompt_injection(clean_text):
+    if not data or "text" not in data:
         return jsonify({
-            "status": "error",
-            "message": "Prompt injection detected"
+            "error": "Missing input text"
         }), 400
 
-    # Create structured prompt
-    prompt = f"""
-    Generate a detailed report on the topic: {clean_text}
+    text = data.get("text", "")
 
-    Include:
-    - Introduction
-    - Key Points
-    - Conclusion
-    """
+    response = call_groq(f"""
+Generate a detailed cybersecurity incident report for the following input:
 
-    ai_output = call_groq(prompt)
+{text}
+
+Include:
+- Title
+- Summary of the issue
+- Risk level (Low/Medium/High)
+- Possible impact
+- Recommended actions
+
+Focus strictly on cybersecurity context.
+Do NOT generate unrelated topics.
+""")
 
     return jsonify({
+        "report": response,
         "status": "success",
-        "topic": clean_text,
-        "report": ai_output
+        "topic": text
     })
-    
+
 
 if __name__ == "__main__":
     app.run(debug=True)
