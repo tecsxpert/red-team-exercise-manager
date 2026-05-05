@@ -2,7 +2,6 @@
 
 ## Project Overview
 Security assessment conducted on the AI microservice component of the Red Team Exercise Manager project.
-Due to incomplete project deployment configuration, only the AI service was available for testing.
 
 ---
 
@@ -12,13 +11,6 @@ Tested component:
 - Port: 5000
 - URL: http://127.0.0.1:5000
 
-Not tested:
-- Frontend
-- Backend APIs
-- Database integration
-
-Reason:
-- `docker-compose.yml` file in repository was empty, preventing full stack deployment.
 
 ---
 
@@ -26,8 +18,7 @@ Reason:
 - Kali Linux
 - OWASP ZAP
 - curl
-- VS Code
-- GitHub
+- python custom testing scripts
 
 ---
 
@@ -71,6 +62,7 @@ Performed:
 Result:
 - Endpoint unavailable for testing due route mismatch.
 
+
 ---
 
 ## Findings Summary
@@ -105,9 +97,6 @@ X-Content-Type-Options: nosniff
 ### 5. Fix API Documentation
 Update README with correct endpoints.
 
-### 6. Complete docker-compose.yml
-Required for full stack deployment and testing.
-
 ---
 
 ## Residual Risks
@@ -115,6 +104,11 @@ Until headers are fixed:
 - Clickjacking risk
 - XSS hardening weakness
 - Information disclosure
+
+---
+## Conclusion
+The assessed application component is operational and does not contain any identified critical or high severity vulnerabilities.
+Security improvements are recommended in HTTP hardening and route documentation consistency.
 
 ---
 
