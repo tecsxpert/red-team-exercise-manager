@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import API from '../services/api'
 import AiPanel from '../components/AiPanel'
-
-const mockExercises = [
-  { id: 1, title: 'Network Penetration Test', description: 'Testing internal network security vulnerabilities', status: 'IN_PROGRESS', severity: 'HIGH', assignedTo: 'Sandhyarani', createdAt: '2026-04-28T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
-  { id: 2, title: 'Social Engineering Test', description: 'Testing social engineering vulnerabilities', status: 'PLANNED', severity: 'MEDIUM', assignedTo: 'Prajwal', createdAt: '2026-04-27T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
-  { id: 3, title: 'Web Application Security', description: 'Testing web app vulnerabilities', status: 'COMPLETED', severity: 'CRITICAL', assignedTo: 'Namratha', createdAt: '2026-04-26T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
-  { id: 4, title: 'Physical Security Audit', description: 'Testing physical access controls', status: 'PLANNED', severity: 'LOW', assignedTo: 'Santosh', createdAt: '2026-04-25T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
-  { id: 5, title: 'Password Policy Review', description: 'Reviewing password policies', status: 'IN_PROGRESS', severity: 'MEDIUM', assignedTo: 'Shreyanka', createdAt: '2026-04-24T10:00:00', startDate: '2026-05-01T00:00:00', endDate: '2026-05-09T00:00:00' },
-]
 
 export default function ExerciseDetail() {
   const navigate = useNavigate()
@@ -24,12 +15,12 @@ export default function ExerciseDetail() {
   const fetchExercise = async () => {
     try {
       setLoading(true)
-      const response = await API.get(`/exercises/${id}`)
-      setExercise(response.data)
+      const response = await fetch(`http://localhost:8081/api/exercises/${id}`)
+      const data = await response.json()
+      setExercise(data)
     } catch (err) {
-      // Use correct mock data based on ID
-      const found = mockExercises.find(e => e.id === parseInt(id))
-      setExercise(found || mockExercises[0])
+      console.log('Error:', err)
+      navigate('/')
     } finally {
       setLoading(false)
     }
@@ -38,9 +29,13 @@ export default function ExerciseDetail() {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this exercise?')) {
       try {
-        await API.delete(`/exercises/${id}`)
-        alert('Exercise deleted successfully!')
-        navigate('/')
+        const response = await fetch(`http://localhost:8081/api/exercises/${id}`, {
+          method: 'DELETE'
+        })
+        if (response.ok) {
+          alert('Exercise deleted successfully!')
+          navigate('/')
+        }
       } catch (err) {
         alert('Failed to delete exercise')
       }
@@ -79,19 +74,15 @@ export default function ExerciseDetail() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-blue-800">Exercise Details</h2>
-        <button
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-        >
+        <button onClick={() => navigate('/')}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
           ← Back
         </button>
       </div>
 
       <div className="bg-white rounded-lg shadow p-6">
-        {/* Title and Badges */}
         <div className="flex justify-between items-start mb-6">
           <h3 className="text-xl font-bold text-gray-800">{exercise.title}</h3>
           <div className="flex gap-2">
@@ -104,13 +95,11 @@ export default function ExerciseDetail() {
           </div>
         </div>
 
-        {/* Description */}
         <div className="mb-6">
           <p className="text-sm font-medium text-gray-500 mb-1">Description</p>
           <p className="text-gray-700">{exercise.description || 'No description provided'}</p>
         </div>
 
-        {/* Details Grid */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div>
             <p className="text-sm font-medium text-gray-500">Assigned To</p>
@@ -118,7 +107,9 @@ export default function ExerciseDetail() {
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500">Created At</p>
-            <p className="text-gray-700">{new Date(exercise.createdAt).toLocaleDateString()}</p>
+            <p className="text-gray-700">
+              {exercise.createdAt ? new Date(exercise.createdAt).toLocaleDateString() : '-'}
+            </p>
           </div>
           <div>
             <p className="text-sm font-medium text-gray-500">Start Date</p>
@@ -134,28 +125,19 @@ export default function ExerciseDetail() {
           </div>
         </div>
 
-        {/* Edit and Delete Buttons */}
         <div className="flex gap-4">
-          <button
-            onClick={() => navigate(`/edit/${id}`)}
-            className="flex-1 py-2 px-4 bg-blue-800 text-white rounded-lg hover:bg-blue-700"
-          >
+          <button onClick={() => navigate(`/edit/${id}`)}
+            className="flex-1 py-2 px-4 bg-blue-800 text-white rounded-lg hover:bg-blue-700">
             Edit Exercise
           </button>
-          <button
-            onClick={handleDelete}
-            className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
-          >
+          <button onClick={handleDelete}
+            className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700">
             Delete Exercise
           </button>
         </div>
       </div>
 
-      {/* AI Panel */}
-      <AiPanel
-        exerciseId={id}
-        exerciseTitle={exercise.title}
-      />
+      <AiPanel exerciseId={id} exerciseTitle={exercise.title} />
     </div>
   )
 }

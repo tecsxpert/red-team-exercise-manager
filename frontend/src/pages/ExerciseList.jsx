@@ -27,7 +27,7 @@ export default function ExerciseList() {
   const fetchExercises = async () => {
     try {
       setLoading(true)
-      const response = await API.get('/exercises')
+      const response = await API.get('/api/exercises')
       setExercises(response.data)
       setFiltered(response.data)
     } catch (err) {
@@ -77,16 +77,11 @@ export default function ExerciseList() {
   const exportToCSV = () => {
     const headers = ['ID', 'Title', 'Status', 'Severity', 'Assigned To', 'Created At']
     const rows = filtered.map(e => [
-      e.id,
-      e.title,
-      e.status,
-      e.severity,
+      e.id, e.title, e.status, e.severity,
       e.assignedTo || '-',
       new Date(e.createdAt).toLocaleDateString()
     ])
-    const csvContent = [headers, ...rows]
-      .map(row => row.join(','))
-      .join('\n')
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -94,6 +89,17 @@ export default function ExerciseList() {
     a.download = 'red-team-exercises.csv'
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this exercise?')) {
+      try {
+        await API.delete(`/api/exercises/${id}`)
+        fetchExercises()
+      } catch (err) {
+        alert('Delete failed — backend not connected')
+      }
+    }
   }
 
   if (loading) {
@@ -106,47 +112,30 @@ export default function ExerciseList() {
 
   return (
     <div className="p-6">
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-blue-800">
-          Red Team Exercises
-        </h2>
+        <h2 className="text-2xl font-bold text-blue-800">Red Team Exercises</h2>
         <div className="flex gap-3">
-          <button
-            onClick={exportToCSV}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
+          <button onClick={exportToCSV} className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
             📥 Export CSV
           </button>
-          <button
-            onClick={() => navigate('/create')}
-            className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700"
-          >
+          <button onClick={() => navigate('/create')} className="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">
             + New Exercise
           </button>
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by title, description..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
               <option value="">All Statuses</option>
               <option value="PLANNED">Planned</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -156,39 +145,24 @@ export default function ExerciseList() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">From Date</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">To Date</label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
         <div className="mt-3 flex justify-end">
-          <button
-            onClick={clearFilters}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm"
-          >
+          <button onClick={clearFilters} className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 text-sm">
             Clear Filters
           </button>
         </div>
       </div>
 
-      {/* Results count */}
-      <p className="text-gray-500 text-sm mb-3">
-        Showing {filtered.length} of {exercises.length} exercises
-      </p>
+      <p className="text-gray-500 text-sm mb-3">Showing {filtered.length} of {exercises.length} exercises</p>
 
-      {/* Empty state */}
       {filtered.length === 0 ? (
         <div className="text-center p-8 text-gray-500 bg-white rounded-lg shadow">
           <p className="text-xl">No exercises found</p>
@@ -209,10 +183,7 @@ export default function ExerciseList() {
             </thead>
             <tbody>
               {filtered.map((exercise, index) => (
-                <tr
-                  key={exercise.id}
-                  className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
-                >
+                <tr key={exercise.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="px-6 py-4 font-medium">{exercise.title}</td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold
@@ -224,32 +195,18 @@ export default function ExerciseList() {
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold
-                      ${exercise.severity === 'HIGH' ? 'bg-red-100 text-red-800' :
+                      ${exercise.severity === 'HIGH' || exercise.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' :
                         exercise.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-green-100 text-green-800'}`}>
                       {exercise.severity}
                     </span>
                   </td>
                   <td className="px-6 py-4">{exercise.assignedTo || '-'}</td>
+                  <td className="px-6 py-4">{new Date(exercise.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
-                    {new Date(exercise.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => navigate(`/detail/${exercise.id}`)}
-                      className="text-green-600 hover:text-green-800 mr-3"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => navigate(`/edit/${exercise.id}`)}
-                      className="text-blue-600 hover:text-blue-800 mr-3"
-                    >
-                      Edit
-                    </button>
-                    <button className="text-red-600 hover:text-red-800">
-                      Delete
-                    </button>
+                    <button onClick={() => navigate(`/detail/${exercise.id}`)} className="text-green-600 hover:text-green-800 mr-3">View</button>
+                    <button onClick={() => navigate(`/edit/${exercise.id}`)} className="text-blue-600 hover:text-blue-800 mr-3">Edit</button>
+                    <button onClick={() => handleDelete(exercise.id)} className="text-red-600 hover:text-red-800">Delete</button>
                   </td>
                 </tr>
               ))}
