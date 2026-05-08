@@ -48,7 +48,7 @@ export default function Login() {
       setLoading(true)
       // Try real backend first
       const response = await API.post('/auth/login', formData)
-      login(response.data.user, response.data.token)
+      login({ email: formData.email }, response.data.token)
       navigate('/')
     } catch (err) {
       // Fallback fake login for demo

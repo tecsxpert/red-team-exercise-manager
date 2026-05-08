@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableCaching
 @EnableMethodSecurity
-@EnableScheduling
+@EnableScheduling   // 🔥 ADD THIS LINE
 public class RedteamApplication {
 
     public static void main(String[] args) {

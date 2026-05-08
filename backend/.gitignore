@@ -1,4 +1,2 @@
-target/
-*.class
-*.db
 /data/
+*.db

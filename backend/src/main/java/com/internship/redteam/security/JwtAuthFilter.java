@@ -28,8 +28,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // PUBLIC APIs
-        if (path.startsWith("/auth/") || path.startsWith("/h2-console") || path.startsWith("/email/")) {
+        // 🔥 ALLOW PUBLIC ENDPOINTS
+        if (path.startsWith("/auth/") ||
+            path.startsWith("/h2-console") ||
+            path.startsWith("/email/")) {
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,13 +46,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (jwtUtil.validateToken(token)) {
 
                 String email = jwtUtil.extractEmail(token);
-                String role = jwtUtil.extractRole(token);
 
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(
                                 email,
                                 null,
-                                Collections.singletonList(() -> "ROLE_" + role)
+                                Collections.singletonList(() -> "ROLE_ADMIN")
                         );
 
                 SecurityContextHolder.getContext().setAuthentication(auth);

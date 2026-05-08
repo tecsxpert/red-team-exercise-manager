@@ -8,7 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/auth")
 public class AuthController {
 
@@ -18,25 +22,47 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // REGISTER
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.createUser(user));
-    }
-
-    // LOGIN
+    // 🔐 LOGIN
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user) {
+    public ResponseEntity<?> login(@RequestBody User request) {
 
-        User dbUser = userService.login(user.getEmail(), user.getPassword());
+        User user = userService.login(request.getEmail(), request.getPassword());
 
-        if (dbUser == null) {
+        if (user == null) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        // 🔥 IMPORTANT (ROLE INCLUDED)
-        String token = jwtUtil.generateToken(dbUser.getEmail(), dbUser.getRole());
+        String token = jwtUtil.generateToken(user.getEmail());
 
-        return ResponseEntity.ok(token);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // 🟢 REGISTER
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody User user) {
+        return ResponseEntity.ok(userService.createUser(user));
+    }
+
+    // 🔄 REFRESH TOKEN
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestHeader("Authorization") String header) {
+
+        String token = header.substring(7);
+
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(401).body("Invalid token");
+        }
+
+        String email = jwtUtil.extractEmail(token);
+
+        String newToken = jwtUtil.generateToken(email);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("token", newToken);
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -29,7 +29,10 @@ export default function ExerciseForm() {
   const fetchExercise = async () => {
     try {
       setFetchLoading(true)
-      const response = await fetch(`http://localhost:8081/api/exercises/${id}`)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`http://localhost:8081/api/exercises/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await response.json()
       setFormData({
         title: data.title || '',
@@ -76,13 +79,17 @@ export default function ExerciseForm() {
     try {
       setSubmitted(true)
       setLoading(true)
+      const token = localStorage.getItem('token')
       const url = isEdit
         ? `http://localhost:8081/api/exercises/${id}`
         : 'http://localhost:8081/api/exercises'
       const method = isEdit ? 'PUT' : 'POST'
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           ...formData,
           startDate: formData.startDate ? formData.startDate + 'T00:00:00' : null,

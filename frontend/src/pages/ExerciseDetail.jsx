@@ -15,7 +15,10 @@ export default function ExerciseDetail() {
   const fetchExercise = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`http://localhost:8081/api/exercises/${id}`)
+      const token = localStorage.getItem('token')
+      const response = await fetch(`http://localhost:8081/api/exercises/${id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await response.json()
       setExercise(data)
     } catch (err) {
@@ -29,8 +32,10 @@ export default function ExerciseDetail() {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this exercise?')) {
       try {
+        const token = localStorage.getItem('token')
         const response = await fetch(`http://localhost:8081/api/exercises/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.ok) {
           alert('Exercise deleted successfully!')
