@@ -25,7 +25,7 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       setLoading(true)
-      const response = await API.get('/exercises')
+      const response = await API.get('/api/exercises')
       const exercises = response.data
       const total = exercises.length
       const planned = exercises.filter(e => e.status === 'PLANNED').length

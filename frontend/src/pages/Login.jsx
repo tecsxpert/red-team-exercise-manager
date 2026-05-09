@@ -46,22 +46,11 @@ export default function Login() {
 
     try {
       setLoading(true)
-      // Try real backend first
       const response = await API.post('/auth/login', formData)
       login({ email: formData.email }, response.data.token)
       navigate('/')
     } catch (err) {
-      // Fallback fake login for demo
-      if (formData.email === 'admin@redteam.com' && 
-          formData.password === 'admin123') {
-        login(
-          { name: 'Admin', email: 'admin@redteam.com' }, 
-          'demo-token-123'
-        )
-        navigate('/')
-      } else {
-        setApiError('Invalid email or password. Please try again.')
-      }
+      setApiError('Invalid email or password. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -71,7 +60,6 @@ export default function Login() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
 
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-800">
             Red Team Manager
@@ -79,16 +67,13 @@ export default function Login() {
           <p className="text-gray-500 mt-2">Sign in to your account</p>
         </div>
 
-        {/* API Error */}
         {apiError && (
           <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg mb-4">
             {apiError}
           </div>
         )}
 
-        {/* Form */}
         <div>
-          {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email <span className="text-red-500">*</span>
@@ -107,7 +92,6 @@ export default function Login() {
             )}
           </div>
 
-          {/* Password */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password <span className="text-red-500">*</span>
@@ -126,7 +110,6 @@ export default function Login() {
             )}
           </div>
 
-          {/* Submit Button */}
           <button
             onClick={handleSubmit}
             disabled={loading}
@@ -135,11 +118,10 @@ export default function Login() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          {/* Demo credentials hint */}
           <div className="mt-4 p-3 bg-blue-50 rounded-lg text-center">
             <p className="text-sm text-blue-800 font-medium">Demo Credentials:</p>
-            <p className="text-sm text-gray-600">Email: admin@redteam.com</p>
-            <p className="text-sm text-gray-600">Password: admin123</p>
+            <p className="text-sm text-gray-600">Email: user1@test.com</p>
+            <p className="text-sm text-gray-600">Password: 123456</p>
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ export default function Analytics() {
   const fetchExercises = async () => {
     try {
       setLoading(true)
-      const response = await API.get('/exercises')
+      const response = await API.get('/api/exercises')
       setExercises(response.data)
     } catch (err) {
       // Mock data

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import API from '../services/api'
+
+const AI_URL = 'http://localhost:5000'
 
 export default function AiPanel({ exerciseId, exerciseTitle }) {
   const [aiDescription, setAiDescription] = useState('')
@@ -13,13 +14,15 @@ export default function AiPanel({ exerciseId, exerciseTitle }) {
     try {
       setLoadingDesc(true)
       setAiDescription('')
-      const response = await API.post('/ai/describe', {
-        exerciseId,
-        title: exerciseTitle
+      const response = await fetch(`${AI_URL}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `Describe this red team exercise: ${exerciseTitle}` })
       })
-      setAiDescription(response.data.description || response.data)
+      const data = await response.json()
+      setAiDescription(data.report || 'No description available')
     } catch (err) {
-      setAiDescription('AI service not connected yet. This will work on Demo Day!')
+      setAiDescription('AI service not connected. Please start the AI service on port 5000.')
     } finally {
       setLoadingDesc(false)
     }
@@ -29,13 +32,15 @@ export default function AiPanel({ exerciseId, exerciseTitle }) {
     try {
       setLoadingRec(true)
       setAiRecommendation('')
-      const response = await API.post('/ai/recommend', {
-        exerciseId,
-        title: exerciseTitle
+      const response = await fetch(`${AI_URL}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `Provide 3 security recommendations for this red team exercise: ${exerciseTitle}` })
       })
-      setAiRecommendation(response.data.recommendation || response.data)
+      const data = await response.json()
+      setAiRecommendation(data.report || 'No recommendations available')
     } catch (err) {
-      setAiRecommendation('AI service not connected yet. This will work on Demo Day!')
+      setAiRecommendation('AI service not connected. Please start the AI service on port 5000.')
     } finally {
       setLoadingRec(false)
     }
@@ -45,13 +50,15 @@ export default function AiPanel({ exerciseId, exerciseTitle }) {
     try {
       setLoadingReport(true)
       setAiReport('')
-      const response = await API.post('/ai/generate-report', {
-        exerciseId,
-        title: exerciseTitle
+      const response = await fetch(`${AI_URL}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `Generate a full security report for this red team exercise: ${exerciseTitle}` })
       })
-      setAiReport(response.data.report || response.data)
+      const data = await response.json()
+      setAiReport(data.report || 'No report available')
     } catch (err) {
-      setAiReport('AI service not connected yet. This will work on Demo Day!')
+      setAiReport('AI service not connected. Please start the AI service on port 5000.')
     } finally {
       setLoadingReport(false)
     }
@@ -107,21 +114,21 @@ export default function AiPanel({ exerciseId, exerciseTitle }) {
       {aiDescription && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
           <p className="text-sm font-bold text-blue-800 mb-2">🔍 AI Description</p>
-          <p className="text-gray-700 text-sm">{aiDescription}</p>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">{aiDescription}</p>
         </div>
       )}
 
       {aiRecommendation && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
           <p className="text-sm font-bold text-green-800 mb-2">💡 AI Recommendation</p>
-          <p className="text-gray-700 text-sm">{aiRecommendation}</p>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">{aiRecommendation}</p>
         </div>
       )}
 
       {aiReport && (
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
           <p className="text-sm font-bold text-purple-800 mb-2">📄 AI Report</p>
-          <p className="text-gray-700 text-sm">{aiReport}</p>
+          <p className="text-gray-700 text-sm whitespace-pre-wrap">{aiReport}</p>
         </div>
       )}
     </div>
